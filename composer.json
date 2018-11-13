@@ -1,0 +1,19 @@
+{
+    "name": "hui/spider",
+    "description": "simple spider",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hui",
+            "email": "learner.hui@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Spider\\": "./src/"
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^6.3"
+    }
+}
