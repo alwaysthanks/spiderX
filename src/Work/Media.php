@@ -9,11 +9,11 @@
  */
 namespace Spider\Work;
 
+use Exception;
 use Spider\Contracts\MediaInterface;
-use Spider\Work\Output;
 use Psr\Http\Message\ResponseInterface;
 
-class Media implements MediaInterface
+class Media extends Work implements MediaInterface
 {
     /**
      * Download Media Type
@@ -26,15 +26,29 @@ class Media implements MediaInterface
     {
         $fileSize = $response->getHeader('Content-Length');
 
-        $output = new Output();
-        // TODO 限制下载大小
-        $output->PrintSize = $fileSize[0] + $output->PrintSize;
-        $output->Number = ++$output->Number;
-        // TODO config 配置
-        $path = './images/';
-        if(!is_dir($path)) mkdir($path);
+        if(self::$config['media.max_size'] < $fileSize[0]) return;
+        self::$output->printSize = $fileSize[0] + self::$output->printSize;
+        self::$output->number = ++self::$output->number;
+
+        $path = self::$config['path'];
+        if(! self::newDir($path)) {
+            throw new Exception('make dir field.');
+        }
+
         $filename = $path . bin2hex(random_bytes(10)) . '.' . @array_pop(explode('/',$response->getHeader('Content-Type')[0]));
         file_put_contents($filename, $response->getBody()->getContents());
         return;
     }
+
+    /**
+     * new dir
+     * @return boolean
+     */
+    public static function newDir($path)
+    {
+        if (is_dir($path) || mkdir($path)) return true;
+        if ( !self::newDir(dirname($path))) return false;
+        return mkdir($path);
+    }
+
 }

@@ -10,20 +10,16 @@
 
 namespace Spider\Work;
 
-use GuzzleHttp\Client;
 use Spider\Contracts\ParseInterface;
-use Spider\Support\Config;
-use Spider\Work\Output;
 use Spider\Contracts\ContentInterface;
 
-class Content implements ContentInterface
+class Content extends Work implements ContentInterface
 {
-    protected $output;
-    protected $request;
     public $response;
 
     public function __construct($response = null)
     {
+        parent::__construct();
         $this->response = $response;
     }
 
@@ -34,9 +30,8 @@ class Content implements ContentInterface
 
     public function getUrlContent(string $url, ParseInterface $parse = null)
     {
-        $this->output = new Output(['StartTime'=> time()]);
         Request::getContent($url, $parse);
-        $this->output->info();
+        self::$output->info();
     }
 
 }

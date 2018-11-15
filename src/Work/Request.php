@@ -10,13 +10,14 @@
 namespace Spider\Work;
 
 use GuzzleHttp\Client;
+use Exception;
+use Spider\Contracts\MediaInterface;
 use Spider\Contracts\ParseInterface;
-use Spider\Exceptions\Exception;
+use Spider\Exceptions\MediaException;
 use Spider\Exceptions\ParseException;
 use Spider\Exceptions\RequestException;
-use Spider\Support\Config;
 
-class Request
+class Request extends Work
 {
     /**
      * @param array $guzzleOptions | Request Url Headers
@@ -25,23 +26,22 @@ class Request
      */
     public static function getHttpClient(array $guzzleOptions=[])
     {
-        // TODO headers config
-        $guzzleOptions = array_merge($guzzleOptions, []);
+        $guzzleOptions = array_merge($guzzleOptions, self::$config['request.headers']);
         return new Client($guzzleOptions);
     }
 
     /**
-     * @param string $url           | Request url
-     * @param $closure              | Custom Parse Url Content
+     * @param string $url          | Request url
+     * @param $parse              | Custom Parse Url Content
      *
-     * @return null
+     * @return Exception
      */
     public static function getContent($url, $parse = null)
     {
         try{
             $result = self::getHttpClient()->get($url);
         } Catch (\Exception $exception) {
-            throw new RequestException('链接'.$url.'请求失败',500, $exception);
+            throw new RequestException('Request Error, url：'.$url.', detail：' . $exception->getMessage(),500, $exception);
         }
 
         /**
@@ -49,13 +49,14 @@ class Request
          **/
         if(substr($result->getHeader('Content-Type')[0], 0, 4) == 'text')
         {
+            var_dump(self::$config['parse.parse']);die;
+            if(is_null($parse)) $parse = new self::$config['parse.parse'];
             try {
                 $contents = $result->getBody()->getContents();
-                if($parse instanceof ParseInterface) {
-                    @call_user_func($parse::parseContent(new Content($contents)));
-                }
+                if(! ($parse instanceof ParseInterface)) throw new Exception('parse class should be instanceof ParseInterface', 501);
+                @call_user_func($parse::parseContent(new Content($contents)));
             } Catch (Exception $exception) {
-                throw new ParseException('解析失败'. $exception->getMessage(), 500);
+                throw new ParseException('Parse Error，detail：'. $exception->getMessage(), $exception->getCode());
             }
 
         }
@@ -64,8 +65,14 @@ class Request
          **/
         else
         {
-            // TODO config 配置 自定义 多媒体文件处理 需要继承 MediaInterface
-            Media::handle($result);
+            try {
+                $media = new self::$config['media.media'];
+                if(! ($media instanceof MediaInterface)) throw new Exception('media class should be instanceof ParseInterface',501);
+                @$media::handle($result);
+            } Catch (\Exception $exception) {
+                throw new MediaException('Media Error，detail：' . $exception->getMessage(), $exception->getCode());
+            }
+
         }
 
     }

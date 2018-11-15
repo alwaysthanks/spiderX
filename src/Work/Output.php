@@ -14,10 +14,10 @@ namespace Spider\Work;
 class Output
 {
     protected static $info  = [
-        'StartTime' => '',
-        'PrintSize' => 0,
-        'Number'    => 0,
-        'DownDir'   => '',
+        'startTime' => '',
+        'printSize' => 0,
+        'number'    => 0,
+        'path'      => '',
     ];
 
     public function __set($name, $value)
@@ -38,13 +38,14 @@ class Output
 
     public function __construct(array $info = [])
     {
-        foreach (self::$info as $item)
+        foreach (self::$info as $key => $item)
         {
-            if(key_exists($item, $info))
+            if(key_exists($key, $info))
             {
-                self::$info[$item] = $info[$item];
+                self::$info[$key] = $info[$key];
             }
         }
+        self::$info['startTime'] = time();
     }
 
     /**
@@ -63,37 +64,35 @@ class Output
     {
         self::format();
         self::Echos('-----------------====================----------------------');
-        self::Echos("       开始运行时间： " . self::$info['StartTime']);
-        self::Echos("       目前已经运行了：" . self::$info['RunTime']);
-        self::Echos("       目前累计下载： ". self::$info['PrintSize'] ." 大小的资源  ");
-        self::Echos("       目前下载资源个数：" . self::$info['Number']);
-        self::Echos("       下载资源目录为：" . self::$info['DownDir']);
+        self::Echos("       开始运行时间： " . self::$info['startTime']);
+        self::Echos("       目前已经运行了：" . self::$info['runTime']);
+        self::Echos("       目前累计下载： ". self::$info['printSize'] ." 大小的资源  ");
+        self::Echos("       目前下载资源个数：" . self::$info['number']);
+        self::Echos("       下载资源目录为：" . self::$info['path']);
         self::Echos('-----------------====================----------------------');
     }
 
     private static function format()
     {
-        if(self::$info['StartTime'] || self::$info['StartTime'] = time())
+        if(self::$info['startTime'] || self::$info['startTime'] = time())
         {
-            $time = time() - self::$info['StartTime'];
+            $time = time() - self::$info['startTime'];
             $s = $time;
             $m = intval($s / 60);
             $Run_h = intval($m / 60);
             $Run_m = $m - ($Run_h * 60);
             $Run_s = $s - ($m * 60);
-            self::$info['StartTime'] = date('Y-m-d H:i:s', self::$info['StartTime']);
-            self::$info['RunTime'] = " $Run_h 小时, $Run_m 分钟, $Run_s 秒";
+            self::$info['startTime'] = date('Y-m-d H:i:s', self::$info['startTime']);
+            self::$info['runTime'] = " $Run_h 小时, $Run_m 分钟, $Run_s 秒";
         }
 
-        if(self::$info['PrintSize']) {
-            $kb = intval(self::$info['PrintSize'] / (1<<10));
-            $mb = intval(self::$info['PrintSize'] / (1<<20));
-            $gb = intval(self::$info['PrintSize'] / (1<<30));
-            self::$info['PrintSize'] = "{$gb}GB \ {$mb}MB \ {$kb}KB";
+        if(self::$info['printSize']) {
+            $kb = intval(self::$info['printSize'] / (1<<10));
+            $mb = intval(self::$info['printSize'] / (1<<20));
+            $gb = intval(self::$info['printSize'] / (1<<30));
+            self::$info['printSize'] = "{$gb}GB \ {$mb}MB \ {$kb}KB";
         } else {
-            self::$info['PrintSize'] = '0KB';
+            self::$info['printSize'] = '0KB';
         }
-
-        if(!self::$info['DownDir']) self::$info['DownDir'] = './images/';
     }
 }
