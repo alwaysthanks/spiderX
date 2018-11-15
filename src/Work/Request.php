@@ -26,7 +26,7 @@ class Request extends Work
      */
     public static function getHttpClient(array $guzzleOptions=[])
     {
-        $guzzleOptions = array_merge($guzzleOptions, self::$config['request.headers']);
+        $guzzleOptions = array_merge($guzzleOptions, ['headers'=> self::$config['request.headers']]);
         return new Client($guzzleOptions);
     }
 
@@ -49,7 +49,6 @@ class Request extends Work
          **/
         if(substr($result->getHeader('Content-Type')[0], 0, 4) == 'text')
         {
-            var_dump(self::$config['parse.parse']);die;
             if(is_null($parse)) $parse = new self::$config['parse.parse'];
             try {
                 $contents = $result->getBody()->getContents();
