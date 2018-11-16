@@ -29,7 +29,7 @@ class DemoParse implements ParseInterface
             {
                 if(strtolower(substr($match,0,4)) == 'http')
                 {
-                    Request::getContent($match);
+                    yield Request::getContent($match);
                 }
             }
         }

@@ -14,20 +14,28 @@ return [
    |--------------------------------------------------------------------------
    | SpiderX Default Config
    |--------------------------------------------------------------------------
-   |
-   |
    */
 
    // Request Config
    'request' => [
 
        /**
+        * request parameter
+        *
+        */
+       'query'  => [
+
+       ],
+
+       /**
         * default headers
         *
-        **/
+        */
        'headers'  => [
            // default request headers
        ],
+
+       //   . . .
 
    ],
 
