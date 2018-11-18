@@ -10,7 +10,6 @@
 
 namespace Spider\Work;
 
-use Spider\Contracts\ParseInterface;
 use Spider\Support\Config;
 
 class Work

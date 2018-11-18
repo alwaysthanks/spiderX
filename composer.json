@@ -11,9 +11,16 @@
     "autoload": {
         "psr-4": {
             "Spider\\": "./src/"
-        }
+        },
+        "files": [
+            "src/Support/helpers.php"
+        ]
     },
     "require": {
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3",
+        "phpunit/phpunit": "^7.4"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.2"
     }
 }

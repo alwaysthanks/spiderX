@@ -15,7 +15,7 @@ use Spider\Contracts\MediaInterface;
 use Spider\Contracts\ParseInterface;
 use Spider\Exceptions\MediaException;
 use Spider\Exceptions\ParseException;
-use Spider\Exceptions\RequestException;
+use Spider\Exceptions\HttpException;
 
 class Request extends Work
 {
@@ -26,7 +26,7 @@ class Request extends Work
      */
     public static function getHttpClient(array $guzzleOptions=[])
     {
-        $guzzleOptions = array_merge($guzzleOptions, self::$config['request.headers']);
+        $guzzleOptions = array_merge($guzzleOptions, array_filter(self::$config['request']));
         return new Client($guzzleOptions);
     }
 
@@ -41,7 +41,7 @@ class Request extends Work
         try{
             $result = self::getHttpClient()->get($url);
         } Catch (\Exception $exception) {
-            throw new RequestException('Request Error, url：'.$url.', detail：' . $exception->getMessage(),500, $exception);
+            throw new HttpException('Request Error, url：'.$url.', detail：' . $exception->getMessage(), $exception->getCode(), $exception);
         }
 
         /**
@@ -49,7 +49,6 @@ class Request extends Work
          **/
         if(substr($result->getHeader('Content-Type')[0], 0, 4) == 'text')
         {
-            var_dump(self::$config['parse.parse']);die;
             if(is_null($parse)) $parse = new self::$config['parse.parse'];
             try {
                 $contents = $result->getBody()->getContents();
