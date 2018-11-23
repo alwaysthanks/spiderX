@@ -10,7 +10,11 @@
 
 namespace Spider\Contracts;
 
+use Psr\Http\Message\ResponseInterface;
+
 interface ParseInterface
 {
-    public static function parseContent(ContentInterface $content);
+    public function parse(ResponseInterface $response);
+
+    public function getNextPagePattern();
 }

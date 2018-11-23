@@ -10,28 +10,14 @@
 
 namespace Spider;
 
+use Psr\Http\Message\ResponseInterface;
+use Spider\Work\Parse;
 
-use Spider\Contracts\ContentInterface;
-use Spider\Contracts\ParseInterface;
-use Spider\Work\Request;
-
-class DemoParse implements ParseInterface
+class DemoParse extends Parse
 {
-    /**
-     * 通用网页图片捕获 Demo
-     */
-    public static function parseContent(ContentInterface $content)
+
+    public function getNextPagePattern()
     {
-        $pattern = '/<img.*src=[\'\"]{1}([http|https].+\.[a-z]{3,4})[\'\"]{1}/iUs';
-        preg_match_all($pattern, $content, $matches);
-        if (count($matches[1]) > 0) {
-            foreach ($matches[1] as $match)
-            {
-                if(strtolower(substr($match,0,4)) == 'http')
-                {
-                    yield Request::getContent($match);
-                }
-            }
-        }
+        return '';
     }
 }

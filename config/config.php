@@ -50,18 +50,6 @@ return [
        'parse' => Spider\Work\Parse::class,
 
        /**
-        * parse target Url
-        * @param pattern
-        *
-        */
-//       'parttern' => '',
-
-   ],
-
-    // Media Type Config
-   'media' => [
-
-       /**
         * @param \Spider\Contracts\MediaInterface
         *
         * @default \Spider\Work\Media
@@ -69,14 +57,14 @@ return [
         */
        'media' => Spider\Work\Media::class,
 
-        /**
-         * (Bytes) out range can’t be download
-         * @default 4MB
-         *
-         **/
-        'max_size'  => 1<<22,
+       /**
+        * (Bytes) out range can’t be download
+        * @default 4MB
+        *
+        **/
+       'max_size'  => 1<<22,
 
-    ],
+   ],
 
     /**
      * Default save path

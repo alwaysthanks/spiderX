@@ -1,5 +1,5 @@
 {
-    "name": "hui/spider",
+    "name": "alwaysthanks/spiderX",
     "description": "simple spider",
     "license": "MIT",
     "authors": [
@@ -11,10 +11,7 @@
     "autoload": {
         "psr-4": {
             "Spider\\": "./src/"
-        },
-        "files": [
-            "src/Support/helpers.php"
-        ]
+        }
     },
     "require": {
         "guzzlehttp/guzzle": "^6.3",
