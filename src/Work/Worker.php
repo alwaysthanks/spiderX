@@ -17,6 +17,7 @@ use Spider\Support\Config;
 
 class Worker
 {
+    protected $processer = [];
     protected static $config;
     protected static $output;
 
@@ -37,14 +38,61 @@ class Worker
         return $this->request ?? $this->request = new Request(array_merge($headers,self::$config['request']));
     }
 
-    protected function callHandler($handler, $payload)
+    public function process($url)
     {
-        if ((! is_callable($handler)) || (! $handler instanceof ParseInterface) ) {
-            throw new ParseException('No valid handler is found in arguments.');
-        }
+       
+        $response = Response::buildFromPsrResponse($this->getRequest()->getContent($url));
 
+
+       /**
+        * @responseType Text
+        **/
+       if(substr($response->getHeader('Content-Type')[0], 0, 4) == 'text')
+       {
+           if(is_null($handle)) $handle = new self::$config['parse.parse'];
+           try {
+               if(! ($handle instanceof ParseInterface)) throw new Exception('parse class should be instanceof ParseInterface', 501);
+               $urls = $handle->parse($response);
+               if(count($urls) > 1)
+                   foreach ($urls as $url)
+                       $this->process($url, $handle);
+           } Catch (Exception $exception) {
+               throw new ParseException('Parse Error，detail：'. $exception->getMessage(), $exception->getCode());
+           }
+
+       }
+       /**
+        * @returnType Media
+        **/
+       else
+       {
+           try {
+               $media = new self::$config['parse.media'];
+               if(! ($media instanceof MediaInterface)) throw new Exception('media class should be instanceof ParseInterface',501);
+               $fileSize = $response->getHeader('Content-Length');
+
+               if(self::$config['parse.max_size'] > $fileSize[0]) {
+                   self::$output['printSize'] += $fileSize[0];
+                   self::$output['number'] += 1;
+
+                   $media::handle($response);
+               }
+
+           } Catch (\Exception $exception) {
+               throw new MediaException('Media Error，detail：' . $exception->getMessage(), $exception->getCode());
+           }
+
+       }
 
     }
+
+    // protected function callHandler($handler = null)
+    // {
+    //     if ($handler instanceof ParseInterface) {
+    //         return $handler;
+    //     }
+    //     return false;
+    // }
 
 
 }

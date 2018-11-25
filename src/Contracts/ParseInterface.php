@@ -14,7 +14,21 @@ use Psr\Http\Message\ResponseInterface;
 
 interface ParseInterface
 {
-    public function parse(ResponseInterface $response);
+	/**
+	 *	[parse description]
+	 * 
+	 * @param  \Psr\Http\Message\ResponseInterface $response
+	 * 
+	 * @return [array]	content
+	 */
+    public function parse(ResponseInterface $response) :array;
 
-    public function getNextPagePattern();
+    /**
+     * get next page url
+     * 
+	 * @param  \Psr\Http\Message\ResponseInterface $response
+	 * 
+     * @return [string|bool] 返回下一页的链接                      
+     */
+    public function getNextPage(ResponseInterface $response) :string|bool;
 }
