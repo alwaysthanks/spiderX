@@ -10,27 +10,36 @@
 
 namespace Spider\Work;
 
-use Spider\Contracts\ParseInterface;
-use Spider\Exceptions\Exception;
-use Spider\Exceptions\ParseException;
 use Spider\Support\Config;
+use Spider\Support\Response;
+use Spider\Contracts\ParseInterface;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 
 class Worker
 {
-    protected $processer = [];
+    protected $processArr = [];
+    protected $pattern = '/((http|https|ftp|telnet|news):\/\/)?([a-z0-9_\-\/\.]+\.[][a-z0-9:;&#@=_~%\?\/\.\,\+\-]+)/Ui';
     protected static $config;
     protected static $output;
 
-    public function __construct(array $conf = [])
+    public function __construct()
     {
-        $conf = array_merge($conf, require __DIR__ . '/../../config/config.php');
+        $conf = require __DIR__ . '/../../config/config.php';
         if(!self::$config) {
             self::$config = new Config($conf);
         }
         if(!self::$output) {
             self::$output = new Output($conf);
         }
-        self::$output->info();
+    }
+
+    protected function isUrl($url)
+    {
+        if(preg_match($this->pattern, $this->url = $url) === 0) {
+            return false;
+        }
+        return true;
     }
 
     protected function getRequest(array $headers = [])
@@ -38,51 +47,32 @@ class Worker
         return $this->request ?? $this->request = new Request(array_merge($headers,self::$config['request']));
     }
 
-    public function process($url)
+    protected function buildResponse($response)
     {
-       
-        $response = Response::buildFromPsrResponse($this->getRequest()->getContent($url));
+        if($response instanceof ResponseInterface) {
+            return Response::buildFromPsrResponse($response);
+        }
+        return Response::buildFromPsrResponse(new GuzzleResponse(200, [], $response));
+    }
 
+    protected function getContent($url, array $headers = [])
+    {
+        return $this->buildResponse($this->getRequest($headers)->getContent($url));
+    }
 
-       /**
-        * @responseType Text
-        **/
-       if(substr($response->getHeader('Content-Type')[0], 0, 4) == 'text')
-       {
-           if(is_null($handle)) $handle = new self::$config['parse.parse'];
-           try {
-               if(! ($handle instanceof ParseInterface)) throw new Exception('parse class should be instanceof ParseInterface', 501);
-               $urls = $handle->parse($response);
-               if(count($urls) > 1)
-                   foreach ($urls as $url)
-                       $this->process($url, $handle);
-           } Catch (Exception $exception) {
-               throw new ParseException('Parse Error，detail：'. $exception->getMessage(), $exception->getCode());
-           }
-
-       }
-       /**
-        * @returnType Media
-        **/
-       else
-       {
-           try {
-               $media = new self::$config['parse.media'];
-               if(! ($media instanceof MediaInterface)) throw new Exception('media class should be instanceof ParseInterface',501);
-               $fileSize = $response->getHeader('Content-Length');
-
-               if(self::$config['parse.max_size'] > $fileSize[0]) {
-                   self::$output['printSize'] += $fileSize[0];
-                   self::$output['number'] += 1;
-
-                   $media::handle($response);
-               }
-
-           } Catch (\Exception $exception) {
-               throw new MediaException('Media Error，detail：' . $exception->getMessage(), $exception->getCode());
-           }
-
-       }
+    public function process(ParseInterface $parse)
+    {
+        if(count($this->processArr) != 0)
+        {
+            foreach ($this->processArr as $item)
+            {
+                if($this->isUrl($item)) {
+                    $parse->process($this->getContent($item));
+                } else {
+                    $parse->process($this->buildResponse($item));
+                }
+            }
+        }
 
     }
 

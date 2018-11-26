@@ -10,25 +10,34 @@
 
 namespace Spider\Contracts;
 
-use Psr\Http\Message\ResponseInterface;
+use Spider\Support\Response;
 
 interface ParseInterface
 {
 	/**
 	 *	[parse description]
 	 * 
-	 * @param  \Psr\Http\Message\ResponseInterface $response
+	 * @param  \Spider\Support\Response $response
 	 * 
 	 * @return [array]	content
 	 */
-    public function parse(ResponseInterface $response) :array;
+    public function parse(Response $response);
 
     /**
      * get next page url
-     * 
-	 * @param  \Psr\Http\Message\ResponseInterface $response
-	 * 
-     * @return [string|bool] 返回下一页的链接                      
+     *
+     * @param  \Spider\Support\Response $response
+     *
+     * @return [string|bool] 返回下一页的链接
      */
-    public function getNextPage(ResponseInterface $response) :string|bool;
+    public function getNextPage(Response $response);
+
+    /**
+     *	[parse description]
+     *
+     * @param  \Spider\Support\Response $response
+     *
+     * @return null
+     */
+    public function process(Response $response);
 }
