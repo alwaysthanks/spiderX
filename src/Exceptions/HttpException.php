@@ -12,10 +12,7 @@ namespace Spider\Exceptions;
 
 use Throwable;
 
-class RequestException extends Exception
+class HttpException extends Exception
 {
-    public function __construct($message = "", $code = 400, Throwable $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-    }
+
 }
