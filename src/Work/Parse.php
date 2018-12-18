@@ -10,24 +10,26 @@
 
 namespace Spider\Work;
 
-
-use Spider\Contracts\ContentInterface;
+use Spider\Support\Response;
 use Spider\Contracts\ParseInterface;
 
-class Parse extends Work implements ParseInterface
+class Parse implements ParseInterface
 {
-    public static function parseContent(ContentInterface $content)
+    public function parse(Response $response)
     {
-        $pattern = '/<img.*src=[\'\"]{1}([http|https].+\.[a-z]{3,4})[\'\"]{1}/iUs';
-        preg_match_all($pattern, $content, $matches);
-        if (count($matches[1]) > 0) {
-            foreach ($matches[1] as $match)
-            {
-                if(strtolower(substr($match,0,4)) == 'http')
-                {
-                    Request::getContent($match);
-                }
-            }
-        }
+        $pattern = '/<img.*src=[\'\\"]{1}([http|https].+\.[a-z]{3,4})[\'\\"]{1}/iUs';
+        preg_match_all($pattern, $response, $matches);
+        return $matches[1] ?? [];
     }
+
+    public function process(Response $response)
+    {
+        $response->save('./images/');
+    }
+
+    public function getNextPage(Response $response)
+    {
+        return false;
+    }
+
 }

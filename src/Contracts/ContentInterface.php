@@ -16,6 +16,6 @@ interface ContentInterface
      * @param $url      | Target Url
      * @return string
      */
-    public function getUrlContent(string $url, ParseInterface $parse = null);
+//    public function getUrlContent(string $url, ParseInterface $parse = null);
 
 }

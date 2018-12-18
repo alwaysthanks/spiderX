@@ -11,41 +11,27 @@
 namespace Spider\Work;
 
 
-class Output
+use Spider\Support\Arr;
+
+class Output extends Arr
 {
-    protected static $info  = [
+    protected $arr = [
         'startTime' => '',
         'printSize' => 0,
         'number'    => 0,
         'path'      => '',
     ];
 
-    public function __set($name, $value)
-    {
-        if(key_exists($name, self::$info))
-        {
-            self::$info[$name] = $value;
-        }
-    }
-
-    public function __get($name)
-    {
-        if(key_exists($name, self::$info))
-        {
-            return self::$info[$name];
-        }
-    }
-
     public function __construct(array $info = [])
     {
-        foreach (self::$info as $key => $item)
+        foreach ($this->arr as $key => $item)
         {
             if(key_exists($key, $info))
             {
-                self::$info[$key] = $info[$key];
+                $this[$key] = $info[$key];
             }
         }
-        self::$info['startTime'] = time();
+        $this['startTime'] = time();
     }
 
     /**
@@ -62,37 +48,37 @@ class Output
 
     public function info()
     {
-        self::format();
+        $this->format();
         self::Echos('-----------------====================----------------------');
-        self::Echos("       开始运行时间： " . self::$info['startTime']);
-        self::Echos("       目前已经运行了：" . self::$info['runTime']);
-        self::Echos("       目前累计下载： ". self::$info['printSize'] ." 大小的资源  ");
-        self::Echos("       目前下载资源个数：" . self::$info['number']);
-        self::Echos("       下载资源目录为：" . self::$info['path']);
+        self::Echos("       开始运行时间： " . $this['startTime']);
+        self::Echos("       目前已经运行了：" . $this['runTime']);
+        self::Echos("       目前累计下载： ". $this['printSize'] ." 大小的资源  ");
+        self::Echos("       目前下载资源个数：" . $this['number']);
+        self::Echos("       下载资源目录为：" . $this['path']);
         self::Echos('-----------------====================----------------------');
     }
 
-    private static function format()
+    private function format()
     {
-        if(self::$info['startTime'] || self::$info['startTime'] = time())
+        if($this['startTime'] || $this['startTime'] = time())
         {
-            $time = time() - self::$info['startTime'];
+            $time = time() - $this['startTime'];
             $s = $time;
             $m = intval($s / 60);
             $Run_h = intval($m / 60);
             $Run_m = $m - ($Run_h * 60);
             $Run_s = $s - ($m * 60);
-            self::$info['startTime'] = date('Y-m-d H:i:s', self::$info['startTime']);
-            self::$info['runTime'] = " $Run_h 小时, $Run_m 分钟, $Run_s 秒";
+            $this['startTime'] = date('Y-m-d H:i:s', $this['startTime']);
+            $this['runTime'] = " $Run_h 小时, $Run_m 分钟, $Run_s 秒";
         }
 
-        if(self::$info['printSize']) {
-            $kb = intval(self::$info['printSize'] / (1<<10));
-            $mb = intval(self::$info['printSize'] / (1<<20));
-            $gb = intval(self::$info['printSize'] / (1<<30));
-            self::$info['printSize'] = "{$gb}GB \ {$mb}MB \ {$kb}KB";
+        if($this['printSize']) {
+            $kb = intval($this['printSize'] / (1<<10));
+            $mb = intval($this['printSize'] / (1<<20));
+            $gb = intval($this['printSize'] / (1<<30));
+            $this['printSize'] = "{$gb}GB \ {$mb}MB \ {$kb}KB";
         } else {
-            self::$info['printSize'] = '0KB';
+            $this['printSize'] = '0KB';
         }
     }
 }
